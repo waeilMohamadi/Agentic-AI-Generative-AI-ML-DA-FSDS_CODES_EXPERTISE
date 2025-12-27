@@ -4,7 +4,7 @@ import os
 import sys
 
 # Add the current directory to path to allow imports from src
-sys.path.append(os.getcwd())
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from src.eda import load_data, show_stats, plot_correlation, plot_distribution, show_missing_values, plot_pairplot, impute_missing_values, impute_all_missing_values, convert_to_numeric
 from src.model import train_linear_regression, train_polynomial_regression, evaluate_model, plot_regression_results, train_knn_regression, train_random_forest_regression, generate_model_explanation, plot_actual_vs_predicted
