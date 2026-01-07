@@ -1,12 +1,16 @@
 import streamlit as st
 import pandas as pd
 import pickle
+import os
 
 # Set page config for a wider layout and custom title
 st.set_page_config(page_title="BTCVision Predictor", page_icon="📈", layout="wide")
 
 # Load the trained model
-model_path = 'random_forest_model.pkl'
+# Use absolute path relative to this script to ensure it works on Streamlit Cloud
+current_dir = os.path.dirname(os.path.abspath(__file__))
+model_path = os.path.join(current_dir, 'random_forest_model.pkl')
+
 with open(model_path, 'rb') as file:
     model_rf = pickle.load(file)
 
