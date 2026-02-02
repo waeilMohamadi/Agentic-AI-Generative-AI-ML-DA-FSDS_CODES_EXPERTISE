@@ -1,0 +1,1211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Restaurant Review Sentiment Analysis - NLP Dashboard</title>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Syne:wght@400;600;700;800&display=swap');
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-primary: #0a0e27;
+      --bg-secondary: #141937;
+      --bg-tertiary: #1a1f3a;
+      --accent-cyan: #00d9ff;
+      --accent-purple: #a855f7;
+      --accent-pink: #ec4899;
+      --accent-green: #10b981;
+      --accent-yellow: #fbbf24;
+      --text-primary: #e2e8f0;
+      --text-secondary: #94a3b8;
+      --border: rgba(255, 255, 255, 0.1);
+    }
+
+    body {
+      font-family: 'JetBrains Mono', monospace;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    #root {
+      min-height: 100vh;
+    }
+
+    .dashboard {
+      position: relative;
+      min-height: 100vh;
+      padding: 2rem;
+    }
+
+    .grid-background {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        linear-gradient(rgba(0, 217, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 217, 255, 0.05) 1px, transparent 1px);
+      background-size: 50px 50px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .content-wrapper {
+      position: relative;
+      z-index: 1;
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+
+    .header {
+      margin-bottom: 3rem;
+      animation: slideDown 0.6s ease-out;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .header-top {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid var(--accent-green);
+      border-radius: 50px;
+      color: var(--accent-green);
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .status-badge.disconnected {
+      background: rgba(236, 72, 153, 0.1);
+      border-color: var(--accent-pink);
+      color: var(--accent-pink);
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--accent-green);
+      border-radius: 50%;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+      50% {
+        opacity: 0.5;
+        transform: scale(1.2);
+      }
+    }
+
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: 3.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.02em;
+    }
+
+    .subtitle {
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+      font-weight: 400;
+    }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    @media (max-width: 1200px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+      h1 {
+        font-size: 2.5rem;
+      }
+    }
+
+    .card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+      animation: fadeIn 0.6s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .card:hover {
+      border-color: var(--accent-cyan);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(0, 217, 255, 0.1);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .card-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .icon {
+      width: 24px;
+      height: 24px;
+      color: var(--accent-cyan);
+    }
+
+    .input-area {
+      margin-bottom: 1.5rem;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 150px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem;
+      color: var(--text-primary);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1rem;
+      resize: vertical;
+      transition: all 0.3s ease;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 0 3px rgba(0, 217, 255, 0.1);
+    }
+
+    textarea::placeholder {
+      color: var(--text-secondary);
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.875rem 1.75rem;
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+      border: none;
+      border-radius: 12px;
+      color: white;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 217, 255, 0.3);
+    }
+
+    .button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .button-secondary {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border);
+    }
+
+    .button-secondary:hover {
+      background: var(--bg-secondary);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .prediction-result {
+      padding: 1.5rem;
+      background: var(--bg-tertiary);
+      border-radius: 12px;
+      border-left: 4px solid var(--accent-cyan);
+      animation: slideIn 0.3s ease-out;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    .prediction-label {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 0.5rem;
+    }
+
+    .prediction-value {
+      font-size: 1.75rem;
+      font-weight: 700;
+      font-family: 'Syne', sans-serif;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .sentiment-positive {
+      color: var(--accent-green);
+    }
+
+    .sentiment-negative {
+      color: var(--accent-pink);
+    }
+
+    .confidence-bar {
+      margin-top: 1rem;
+      height: 8px;
+      background: var(--bg-secondary);
+      border-radius: 50px;
+      overflow: hidden;
+    }
+
+    .confidence-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+      border-radius: 50px;
+      transition: width 0.6s ease-out;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+
+    @media (max-width: 768px) {
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .stat-card {
+      background: var(--bg-tertiary);
+      border-radius: 12px;
+      padding: 1.5rem;
+      border: 1px solid var(--border);
+      transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+      border-color: var(--accent-cyan);
+      transform: translateY(-2px);
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      font-family: 'Syne', sans-serif;
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .model-comparison {
+      margin-top: 2rem;
+    }
+
+    .model-grid {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .model-item {
+      display: grid;
+      grid-template-columns: 200px 1fr auto;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      transition: all 0.3s ease;
+    }
+
+    .model-item:hover {
+      border-color: var(--accent-cyan);
+      transform: translateX(4px);
+    }
+
+    .model-name {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .model-bar-container {
+      height: 24px;
+      background: var(--bg-secondary);
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .model-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+      border-radius: 12px;
+      transition: width 0.6s ease-out;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: 0.5rem;
+    }
+
+    .model-accuracy {
+      font-size: 0.875rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      text-align: right;
+      min-width: 60px;
+    }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .metric-box {
+      background: var(--bg-tertiary);
+      padding: 1rem;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+
+    .metric-label {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .metric-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--accent-cyan);
+      margin-top: 0.25rem;
+    }
+
+    .confusion-matrix {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .matrix-cell {
+      aspect-ratio: 1;
+      background: var(--bg-tertiary);
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+
+    .matrix-cell:hover {
+      border-color: var(--accent-cyan);
+      transform: scale(1.05);
+    }
+
+    .matrix-value {
+      font-size: 2.5rem;
+      font-weight: 700;
+      font-family: 'Syne', sans-serif;
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .matrix-label {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-top: 0.5rem;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .tab {
+      padding: 0.75rem 1.5rem;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      color: var(--text-secondary);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .tab:hover {
+      color: var(--text-primary);
+      background: var(--bg-tertiary);
+    }
+
+    .tab.active {
+      color: var(--accent-cyan);
+      background: var(--bg-tertiary);
+      border-color: var(--accent-cyan);
+    }
+
+    .code-block {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      overflow-x: auto;
+      margin-top: 1rem;
+    }
+
+    .code-block pre {
+      margin: 0;
+      color: var(--text-primary);
+      font-size: 0.875rem;
+      line-height: 1.6;
+    }
+
+    .highlight-green {
+      color: var(--accent-green);
+    }
+
+    .highlight-cyan {
+      color: var(--accent-cyan);
+    }
+
+    .highlight-purple {
+      color: var(--accent-purple);
+    }
+
+    .loading {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      background: rgba(168, 85, 247, 0.2);
+      border: 1px solid var(--accent-purple);
+      border-radius: 50px;
+      color: var(--accent-purple);
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .badge-success {
+      background: rgba(16, 185, 129, 0.2);
+      border-color: var(--accent-green);
+      color: var(--accent-green);
+    }
+
+    .badge-warning {
+      background: rgba(251, 191, 36, 0.2);
+      border-color: var(--accent-yellow);
+      color: var(--accent-yellow);
+    }
+
+    .alert {
+      padding: 1rem;
+      background: rgba(236, 72, 153, 0.1);
+      border: 1px solid var(--accent-pink);
+      border-radius: 12px;
+      color: var(--accent-pink);
+      margin-bottom: 1.5rem;
+    }
+
+    .alert-success {
+      background: rgba(16, 185, 129, 0.1);
+      border-color: var(--accent-green);
+      color: var(--accent-green);
+    }
+
+    select {
+      padding: 0.75rem 1rem;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--text-primary);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    select:focus {
+      outline: none;
+      border-color: var(--accent-cyan);
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    // Configuration
+    const API_BASE_URL = 'http://localhost:5000/api';
+
+    function App() {
+      const [reviewText, setReviewText] = useState('');
+      const [prediction, setPrediction] = useState(null);
+      const [isAnalyzing, setIsAnalyzing] = useState(false);
+      const [activeTab, setActiveTab] = useState('predict');
+      const [selectedModel, setSelectedModel] = useState('Decision Tree');
+      const [apiConnected, setApiConnected] = useState(false);
+      const [modelResults, setModelResults] = useState([]);
+      const [metrics, setMetrics] = useState(null);
+      const [isTraining, setIsTraining] = useState(false);
+      const [alert, setAlert] = useState(null);
+
+      // Check API health on mount
+      useEffect(() => {
+        checkApiHealth();
+      }, []);
+
+      const checkApiHealth = async () => {
+        try {
+          const response = await fetch(`${API_BASE_URL}/health`);
+          if (response.ok) {
+            setApiConnected(true);
+            loadModels();
+            loadMetrics();
+          }
+        } catch (error) {
+          setApiConnected(false);
+        }
+      };
+
+      const loadModels = async () => {
+        try {
+          const response = await fetch(`${API_BASE_URL}/models`);
+          if (response.ok) {
+            const data = await response.json();
+            setModelResults(data.models);
+          }
+        } catch (error) {
+          console.log('Models not loaded yet');
+        }
+      };
+
+      const loadMetrics = async () => {
+        try {
+          const response = await fetch(`${API_BASE_URL}/metrics`);
+          if (response.ok) {
+            const data = await response.json();
+            setMetrics(data);
+          }
+        } catch (error) {
+          console.log('Metrics not loaded yet');
+        }
+      };
+
+      const trainModels = async () => {
+        setIsTraining(true);
+        setAlert({ type: 'info', message: 'Training models... This may take a minute.' });
+
+        try {
+          const response = await fetch(`${API_BASE_URL}/train`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({})
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            setModelResults(data.models);
+            setAlert({ type: 'success', message: `Models trained successfully! ${data.dataset_size} reviews processed.` });
+            loadMetrics();
+          } else {
+            setAlert({ type: 'error', message: data.message || 'Training failed' });
+          }
+        } catch (error) {
+          setAlert({ type: 'error', message: 'Cannot connect to backend. Make sure Flask server is running.' });
+        } finally {
+          setIsTraining(false);
+        }
+      };
+
+      const analyzeReview = async () => {
+        if (!reviewText.trim()) return;
+
+        if (!apiConnected) {
+          setAlert({ type: 'error', message: 'API not connected. Using demo mode.' });
+          simulateAnalysis();
+          return;
+        }
+
+        setIsAnalyzing(true);
+        setAlert(null);
+
+        try {
+          const response = await fetch(`${API_BASE_URL}/predict`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              text: reviewText,
+              model: selectedModel
+            })
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            setPrediction({
+              sentiment: data.sentiment,
+              confidence: data.confidence,
+              model_used: data.model_used
+            });
+          } else {
+            setAlert({ type: 'error', message: data.message });
+            if (data.error === 'Model not trained') {
+              setAlert({ 
+                type: 'warning', 
+                message: 'Model not trained yet. Click "Train Models" in the Models tab first.' 
+              });
+            }
+          }
+        } catch (error) {
+          setAlert({ type: 'error', message: 'Prediction failed. Using demo mode.' });
+          simulateAnalysis();
+        } finally {
+          setIsAnalyzing(false);
+        }
+      };
+
+      const simulateAnalysis = async () => {
+        setIsAnalyzing(true);
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        const positiveWords = ['good', 'great', 'excellent', 'amazing', 'wonderful', 'love', 'best', 'delicious', 'perfect'];
+        const negativeWords = ['bad', 'terrible', 'horrible', 'awful', 'worst', 'hate', 'disgusting', 'poor'];
+
+        const text = reviewText.toLowerCase();
+        let score = 0.5;
+
+        positiveWords.forEach(word => {
+          if (text.includes(word)) score += 0.1;
+        });
+
+        negativeWords.forEach(word => {
+          if (text.includes(word)) score -= 0.1;
+        });
+
+        score = Math.max(0.1, Math.min(0.9, score));
+
+        setPrediction({
+          sentiment: score > 0.5 ? 'Positive' : 'Negative',
+          confidence: score > 0.5 ? score : 1 - score,
+          model_used: 'Demo Mode'
+        });
+
+        setIsAnalyzing(false);
+      };
+
+      const clearPrediction = () => {
+        setReviewText('');
+        setPrediction(null);
+        setAlert(null);
+      };
+
+      // Default data for demo mode
+      const defaultStats = {
+        accuracy: 0.815,
+        bias: 0.892,
+        variance: 0.815
+      };
+
+      const defaultModels = [
+        { name: 'Decision Tree', accuracy: 0.73, type: 'baseline' },
+        { name: 'Logistic Regression', accuracy: 0.78, type: 'linear' },
+        { name: 'Random Forest', accuracy: 0.82, type: 'ensemble' },
+        { name: 'XGBoost', accuracy: 0.85, type: 'boosting' },
+        { name: 'LGBM', accuracy: 0.84, type: 'boosting' },
+        { name: 'SVM', accuracy: 0.80, type: 'kernel' }
+      ];
+
+      const displayModels = modelResults.length > 0 ? modelResults : defaultModels;
+      const displayMetrics = metrics || {
+        confusion_matrix: { true_positive: 85, false_positive: 12, true_negative: 78, false_negative: 25 },
+        metrics: { accuracy: 0.815, precision: 0.876, recall: 0.773, f1_score: 0.821, specificity: 0.867 }
+      };
+
+      return (
+        <div className="dashboard">
+          <div className="grid-background"></div>
+          
+          <div className="content-wrapper">
+            <header className="header">
+              <div className="header-top">
+                <div className={`status-badge ${!apiConnected ? 'disconnected' : ''}`}>
+                  <span className="status-dot"></span>
+                  {apiConnected ? 'API Connected' : 'Demo Mode'}
+                </div>
+                <span className="badge badge-success">TF-IDF Vectorization</span>
+                <span className="badge">NLP Pipeline</span>
+              </div>
+              <h1>Restaurant Review Analyzer</h1>
+              <p className="subtitle">
+                Natural Language Processing • Sentiment Classification • Machine Learning
+                {!apiConnected && ' • Start Flask backend for full features'}
+              </p>
+            </header>
+
+            {alert && (
+              <div className={`alert ${alert.type === 'success' ? 'alert-success' : ''}`}>
+                {alert.message}
+              </div>
+            )}
+
+            <div className="tabs">
+              <button 
+                className={`tab ${activeTab === 'predict' ? 'active' : ''}`}
+                onClick={() => setActiveTab('predict')}
+              >
+                🎯 Predict
+              </button>
+              <button 
+                className={`tab ${activeTab === 'models' ? 'active' : ''}`}
+                onClick={() => setActiveTab('models')}
+              >
+                📊 Models
+              </button>
+              <button 
+                className={`tab ${activeTab === 'metrics' ? 'active' : ''}`}
+                onClick={() => setActiveTab('metrics')}
+              >
+                📈 Metrics
+              </button>
+              <button 
+                className={`tab ${activeTab === 'setup' ? 'active' : ''}`}
+                onClick={() => setActiveTab('setup')}
+              >
+                ⚙️ Setup
+              </button>
+            </div>
+
+            {activeTab === 'predict' && (
+              <div className="main-grid">
+                <div className="card">
+                  <div className="card-header">
+                    <h2 className="card-title">
+                      <span className="icon">🔮</span>
+                      Review Sentiment Prediction
+                    </h2>
+                    <select 
+                      value={selectedModel} 
+                      onChange={(e) => setSelectedModel(e.target.value)}
+                      disabled={!apiConnected}
+                    >
+                      <option value="Decision Tree">Decision Tree</option>
+                      <option value="Random Forest">Random Forest</option>
+                      <option value="Logistic Regression">Logistic Regression</option>
+                      <option value="Naive Bayes">Naive Bayes</option>
+                      <option value="KNN">KNN</option>
+                      <option value="SVM">SVM</option>
+                      <option value="Linear Regression">Linear Regression</option>
+                      <option value="XGBoost">XGBoost</option>
+                      <option value="LGBM">LGBM</option>
+                    </select>
+                  </div>
+
+                  <div className="input-area">
+                    <textarea
+                      value={reviewText}
+                      onChange={(e) => setReviewText(e.target.value)}
+                      placeholder="Enter a restaurant review here... (e.g., 'The food was amazing and the service was excellent!')"
+                      disabled={isAnalyzing}
+                    />
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '1rem' }}>
+                    <button 
+                      className="button"
+                      onClick={analyzeReview}
+                      disabled={!reviewText.trim() || isAnalyzing}
+                    >
+                      {isAnalyzing ? (
+                        <>
+                          <span className="loading"></span>
+                          Analyzing...
+                        </>
+                      ) : (
+                        <>
+                          <span>⚡</span>
+                          Analyze Sentiment
+                        </>
+                      )}
+                    </button>
+                    
+                    {(reviewText || prediction) && (
+                      <button 
+                        className="button button-secondary"
+                        onClick={clearPrediction}
+                        disabled={isAnalyzing}
+                      >
+                        Clear
+                      </button>
+                    )}
+                  </div>
+
+                  {prediction && (
+                    <div className="prediction-result" style={{ marginTop: '1.5rem' }}>
+                      <div className="prediction-label">Predicted Sentiment</div>
+                      <div className={`prediction-value ${prediction.sentiment === 'Positive' ? 'sentiment-positive' : 'sentiment-negative'}`}>
+                        <span>{prediction.sentiment === 'Positive' ? '😊' : '😞'}</span>
+                        {prediction.sentiment}
+                      </div>
+                      <div className="prediction-label" style={{ marginTop: '1rem' }}>
+                        Confidence: {(prediction.confidence * 100).toFixed(1)}%
+                      </div>
+                      <div className="confidence-bar">
+                        <div 
+                          className="confidence-fill" 
+                          style={{ width: `${prediction.confidence * 100}%` }}
+                        ></div>
+                      </div>
+                      <div style={{ marginTop: '1rem', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
+                        Model: {prediction.model_used}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className="card">
+                  <div className="card-header">
+                    <h2 className="card-title">
+                      <span className="icon">📊</span>
+                      Performance Stats
+                    </h2>
+                  </div>
+
+                  <div className="stats-grid">
+                    <div className="stat-card">
+                      <div className="stat-label">Accuracy</div>
+                      <div className="stat-value">
+                        {(displayMetrics.metrics.accuracy * 100).toFixed(1)}%
+                      </div>
+                    </div>
+                    <div className="stat-card">
+                      <div className="stat-label">Precision</div>
+                      <div className="stat-value">
+                        {(displayMetrics.metrics.precision * 100).toFixed(1)}%
+                      </div>
+                    </div>
+                    <div className="stat-card">
+                      <div className="stat-label">Recall</div>
+                      <div className="stat-value">
+                        {(displayMetrics.metrics.recall * 100).toFixed(1)}%
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'models' && (
+              <div className="card">
+                <div className="card-header">
+                  <h2 className="card-title">
+                    <span className="icon">🏆</span>
+                    Model Performance Comparison
+                  </h2>
+                  {apiConnected && (
+                    <button 
+                      className="button"
+                      onClick={trainModels}
+                      disabled={isTraining}
+                    >
+                      {isTraining ? (
+                        <>
+                          <span className="loading"></span>
+                          Training...
+                        </>
+                      ) : (
+                        'Train Models'
+                      )}
+                    </button>
+                  )}
+                </div>
+
+                <div className="model-grid">
+                  {displayModels
+                    .sort((a, b) => b.accuracy - a.accuracy)
+                    .map((model, index) => (
+                    <div key={model.name} className="model-item">
+                      <div>
+                        <div className="model-name">
+                          {index === 0 && '🥇 '}
+                          {index === 1 && '🥈 '}
+                          {index === 2 && '🥉 '}
+                          {model.name}
+                        </div>
+                        <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '0.25rem' }}>
+                          {model.type}
+                        </div>
+                      </div>
+                      <div className="model-bar-container">
+                        <div 
+                          className="model-bar" 
+                          style={{ width: `${model.accuracy * 100}%` }}
+                        >
+                        </div>
+                      </div>
+                      <div className="model-accuracy">
+                        {(model.accuracy * 100).toFixed(1)}%
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'metrics' && (
+              <div className="main-grid">
+                <div className="card">
+                  <div className="card-header">
+                    <h2 className="card-title">
+                      <span className="icon">🎯</span>
+                      Confusion Matrix
+                    </h2>
+                  </div>
+
+                  <div className="confusion-matrix">
+                    <div className="matrix-cell">
+                      <div className="matrix-value">{displayMetrics.confusion_matrix.true_positive}</div>
+                      <div className="matrix-label">True Positive</div>
+                    </div>
+                    <div className="matrix-cell">
+                      <div className="matrix-value">{displayMetrics.confusion_matrix.false_positive}</div>
+                      <div className="matrix-label">False Positive</div>
+                    </div>
+                    <div className="matrix-cell">
+                      <div className="matrix-value">{displayMetrics.confusion_matrix.false_negative}</div>
+                      <div className="matrix-label">False Negative</div>
+                    </div>
+                    <div className="matrix-cell">
+                      <div className="matrix-value">{displayMetrics.confusion_matrix.true_negative}</div>
+                      <div className="matrix-label">True Negative</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="card">
+                  <div className="card-header">
+                    <h2 className="card-title">
+                      <span className="icon">📈</span>
+                      Performance Metrics
+                    </h2>
+                  </div>
+
+                  <div className="metrics-grid">
+                    <div className="metric-box">
+                      <div className="metric-label">Precision</div>
+                      <div className="metric-value">
+                        {(displayMetrics.metrics.precision * 100).toFixed(1)}%
+                      </div>
+                    </div>
+                    <div className="metric-box">
+                      <div className="metric-label">Recall</div>
+                      <div className="metric-value">
+                        {(displayMetrics.metrics.recall * 100).toFixed(1)}%
+                      </div>
+                    </div>
+                    <div className="metric-box">
+                      <div className="metric-label">F1 Score</div>
+                      <div className="metric-value">
+                        {(displayMetrics.metrics.f1_score * 100).toFixed(1)}%
+                      </div>
+                    </div>
+                    <div className="metric-box">
+                      <div className="metric-label">Specificity</div>
+                      <div className="metric-value">
+                        {(displayMetrics.metrics.specificity * 100).toFixed(1)}%
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'setup' && (
+              <div className="card">
+                <div className="card-header">
+                  <h2 className="card-title">
+                    <span className="icon">⚙️</span>
+                    Backend Setup Instructions
+                  </h2>
+                </div>
+
+                <div className="code-block">
+                  <pre>
+<span className="highlight-purple"># Step 1: Install Dependencies</span>
+pip install -r requirements.txt
+
+<span className="highlight-purple"># Step 2: Place your dataset</span>
+<span className="highlight-cyan">→</span> Save Restaurant_Reviews.tsv in the same directory as backend_api.py
+
+<span className="highlight-purple"># Step 3: Start Flask Server</span>
+python backend_api.py
+
+<span className="highlight-purple"># Step 4: Server will start on</span>
+<span className="highlight-green">✓</span> http://localhost:5000
+
+<span className="highlight-purple"># Step 5: Train models (first time)</span>
+<span className="highlight-cyan">→</span> Click "Train Models" button in the Models tab
+<span className="highlight-cyan">→</span> Or use: POST http://localhost:5000/api/train
+
+<span className="highlight-green">✓ Status:</span> {apiConnected ? 'Backend Connected!' : 'Backend Not Connected'}
+                  </pre>
+                </div>
+
+                {!apiConnected && (
+                  <div className="alert" style={{ marginTop: '1.5rem' }}>
+                    Backend server not detected. Make sure Flask is running on http://localhost:5000
+                  </div>
+                )}
+
+                <div style={{ marginTop: '2rem' }}>
+                  <h3 style={{ marginBottom: '1rem', color: 'var(--text-primary)' }}>
+                    API Endpoints
+                  </h3>
+                  <div className="code-block">
+                    <pre>
+<span className="highlight-cyan">GET</span>  /api/health          - Health check
+<span className="highlight-cyan">POST</span> /api/train           - Train all models
+<span className="highlight-cyan">POST</span> /api/predict         - Predict sentiment
+<span className="highlight-cyan">GET</span>  /api/models          - Get model comparison
+<span className="highlight-cyan">GET</span>  /api/metrics         - Get performance metrics
+<span className="highlight-cyan">GET</span>  /api/dataset-info    - Get dataset information
+<span className="highlight-cyan">POST</span> /api/preprocess      - Preprocess text only
+                    </pre>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.render(<App />, document.getElementById('root'));
+  </script>
+</body>
+</html>
