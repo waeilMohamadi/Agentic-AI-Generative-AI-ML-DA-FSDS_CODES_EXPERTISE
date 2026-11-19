@@ -1,0 +1,49 @@
+{
+  "dataset_rows": 7043,
+  "train_rows": 5634,
+  "test_rows": 1409,
+  "selection_metric": "5-fold train-only average precision",
+  "cross_validation": {
+    "logistic_regression": {
+      "mean_average_precision": 0.66,
+      "std_average_precision": 0.0195
+    },
+    "hist_gradient_boosting": {
+      "mean_average_precision": 0.6614,
+      "std_average_precision": 0.022
+    }
+  },
+  "selected_model": "hist_gradient_boosting",
+  "held_out_test": {
+    "average_precision": 0.6556,
+    "roc_auc": 0.8436,
+    "classification_threshold": 0.5,
+    "classification_report": {
+      "0": {
+        "precision": 0.8387096774193549,
+        "recall": 0.9043478260869565,
+        "f1-score": 0.8702928870292888,
+        "support": 1035.0
+      },
+      "1": {
+        "precision": 0.6621160409556314,
+        "recall": 0.5187165775401069,
+        "f1-score": 0.5817091454272864,
+        "support": 374.0
+      },
+      "accuracy": 0.8019872249822569,
+      "macro avg": {
+        "precision": 0.7504128591874931,
+        "recall": 0.7115322018135317,
+        "f1-score": 0.7260010162282875,
+        "support": 1409.0
+      },
+      "weighted avg": {
+        "precision": 0.7918352842061309,
+        "recall": 0.8019872249822569,
+        "f1-score": 0.7936922345387643,
+        "support": 1409.0
+      }
+    }
+  }
+}
