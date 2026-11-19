@@ -6,11 +6,18 @@ Project	What it demonstrates	Stack
 [Document Q&A Assistant](Document-QA-Assistant/)	PDF question answering with OCR for scanned pages, local embeddings, vector retrieval, conversational follow-ups, and page-linked source passages.	Python, Streamlit, PyMuPDF, RapidOCR, Sentence Transformers, ChromaDB, Groq
 [Agentic Shopping Cart Assistant](Agentic-Shopping-Cart-MCP/)	A Spring Boot MCP server that exposes cart and product actions to an external AI assistant, backed by a MySQL cart.	Java 17, Spring Boot, Spring AI, MCP, MySQL, JUnit
 EDA and Regression Analysis App	Interactive data exploration, missing-value handling, charts, and four regression models.	Python, Streamlit, pandas, scikit-learn
+[MLOps and MLflow experiment](mlops-code.py)	Compares classifiers on synthetic imbalanced data and logs parameters, metrics, and models to a local MLflow tracking server.	Python, scikit-learn, XGBoost, imbalanced-learn, MLflow
 
 
 Each project folder has its own README with setup instructions, scope, and limitations. Other notebooks and scripts in the root are learning exercises and experiments.
+Deep learning project in development
+[Butterfly Species Classification with Transfer Learning](ButterflyClassificationTransferLearning/) contains the project brief for fine-grained image classification across 75 butterfly species. The planned work covers image preparation and augmentation, fine-tuning and comparing pretrained convolutional neural networks, evaluation on unseen images, and a Streamlit inference app. The folder currently contains the brief PDF; training notebooks, model weights, evaluation results, and application code have not been added yet.
+MLOps practice
+The [MLflow experiment script](mlops-code.py) uses a stratified train/test split on generated imbalanced classification data. It compares logistic regression, random forest, XGBoost, and XGBoost with SMOTETomek, then logs selected metrics, parameters, and model artifacts to an MLflow server at http://localhost:5000. The [MLflow notebook](3rd_%20mlflow_model_registiration.ipynb) explores model registration. The [`cicd workflows` folder](cicd%20workflows/) contains a separate Iris training and CI/CD exercise; its workflow is an example file, not an active GitHub Actions workflow, and its training code has a machine-specific data path.
 Areas I am learning and applying
 - Data science and ML: exploratory analysis, cleaning, feature preprocessing, classification, regression, cross-validation, and model evaluation.
+- Deep learning: studying image classification, convolutional neural networks, and transfer learning through the butterfly classification project brief.
+- MLOps: MLflow experiment tracking and model artifacts, with CI/CD exercises in the repository.
 - Generative AI: prompt engineering, retrieval-augmented generation (RAG), embeddings, OCR, and source-grounded answers.
 - Agentic AI: LLM tool calling and Model Context Protocol (MCP) integrations.
 - Application development: Streamlit and Gradio interfaces, FastAPI services, and Spring Boot APIs.
