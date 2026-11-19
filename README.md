@@ -1,71 +1,28 @@
-# 📊 EDA & Regression Analysis App
+AI, Machine Learning, and Data Science Portfolio
+I'm Waeil Mohamadi, an entry-level candidate building projects across full stack data science (FSDS), machine learning, generative AI, and agentic AI. This repository contains runnable applications as well as practice notebooks and course exercises. The projects below are the best starting points.
+Featured projects
+Project	What it demonstrates	Stack
+[Customer Churn Prediction](Customer-Churn-Prediction/)	Reproducible classification pipeline, train-only cross-validation, held-out evaluation, a Gradio interface, and a FastAPI endpoint. The recorded test ROC AUC is 0.8436 on the included sample dataset.	Python, pandas, scikit-learn, Gradio, FastAPI
+[Document Q&A Assistant](Document-QA-Assistant/)	PDF question answering with OCR for scanned pages, local embeddings, vector retrieval, conversational follow-ups, and page-linked source passages.	Python, Streamlit, PyMuPDF, RapidOCR, Sentence Transformers, ChromaDB, Groq
+[Agentic Shopping Cart Assistant](Agentic-Shopping-Cart-MCP/)	A Spring Boot MCP server that exposes cart and product actions to an external AI assistant, backed by a MySQL cart.	Java 17, Spring Boot, Spring AI, MCP, MySQL, JUnit
+EDA and Regression Analysis App	Interactive data exploration, missing-value handling, charts, and four regression models.	Python, Streamlit, pandas, scikit-learn
 
-A powerful Streamlit user interface for Exploratory Data Analysis (EDA) and building Regression Models without writing code.
 
-## 🚀 Features
+Each project folder has its own README with setup instructions, scope, and limitations. Other notebooks and scripts in the root are learning exercises and experiments.
+Areas I am learning and applying
+- Data science and ML: exploratory analysis, cleaning, feature preprocessing, classification, regression, cross-validation, and model evaluation.
+- Generative AI: prompt engineering, retrieval-augmented generation (RAG), embeddings, OCR, and source-grounded answers.
+- Agentic AI: LLM tool calling and Model Context Protocol (MCP) integrations.
+- Application development: Streamlit and Gradio interfaces, FastAPI services, and Spring Boot APIs.
+EDA and Regression Analysis App
+The root-level Streamlit app lets you upload a CSV or explore an included nuclear energy dataset. It shows data types, summary statistics, missing values, correlation and distribution charts, and pair plots. You can fill missing values, select numeric features and a target, and train linear, polynomial, K-nearest neighbors, or random forest regression.
 
-### 1. Exploratory Data Analysis (EDA)
-- **Data Overview**: View dataset shape, columns, and data types.
-- **Descriptive Statistics**: Summary stats (mean, std, min, max, etc.).
-- **Missing Value Handling**: 
-    - Visualize missing data.
-    - **Impute** values using Mean, Median, or Mode.
-    - **Bulk Imputation** support for cleaning all columns at once.
-- **Visualizations**:
-    - **Correlation Heatmap**: Understand relationships between variables.
-    - **Distribution Plots**: Analyze the spread of numeric data.
-    - **Pair Plots**: Visualize scatter plots for multiple variables.
+Run locally:
+python -m venv .venv
+python -m pip install -r requirements.txt
+streamlit run app.py
+Use the Python interpreter from your virtual environment for the install and run commands. The app entry point is app.py; src/eda.py contains exploration and cleaning functions, src/model.py contains regression helpers, and archive/ contains example datasets.
 
-### 2. Regression Modeling
-Build and compare multiple types of regression models:
-- **Linear Regression**: Best for simple linear relationships.
-- **Polynomial Regression**: Capture non-linear patterns (adjustable degree).
-- **K-Nearest Neighbors (KNN)**: Distance-based regression (adjustable K).
-- **Random Forest**: Robust ensemble method (adjustable trees).
-
-**Key Capabilities:**
-- **Dynamic Feature Selection**: Choose one or multiple independent variables ($X$) to predict your target ($Y$).
-- **Smart Data Cleaning**: Automatically attempts to fix text-based numbers (e.g., "$1,200" → 1200) so you don't lose data.
-- **Model Evaluation**: View **R² Score** and **Mean Squared Error (MSE)**.
-- **Visualizations**: 
-    - **Regression Line** (for single feature).
-    - **Actual vs Predicted Plot** (for multiple features).
-- **Model Explainability**: Get text-based insights on how the model works and interpreting coefficients.
-
-## 🛠️ Installation & Setup
-
-1. **Prerequisites**: Ensure you have Python installed.
-2. **Install Dependencies**:
-   ```bash
-   pip install streamlit pandas scikit-learn seaborn matplotlib
-   ```
-3. **Run the App**:
-   ```bash
-   streamlit run app.py
-   ```
-
-## 📂 Project Structure
-- `app.py`: Main application entry point.
-- `src/eda.py`: Functions for data loading, cleaning, and EDA visualizations.
-- `src/model.py`: Logic for training models and generating predictions/plots.
-- `archive/`: Folder containing default datasets.
-
-## 💡 How to Use
-1. **Upload Data**: Use the sidebar to upload your own CSV, or use the default Nuclear Energy dataset.
-2. **Clean Data**: Go to the "EDA" tab to check for missing values and fill them if necessary.
-3. **Train Model**: Go to "Regression Modeling", select your Target and Features, and click "Train Model".
-
-## ☁️ Deployment (Streamlit Cloud)
-You can deploy this app for free using Streamlit Community Cloud:
-
-1.  **Push to GitHub**:
-    *   Initialize a git repository: `git init`, `git add .`, `git commit -m "Initial commit"`.
-    *   Create a new public repository on GitHub.
-    *   Push your code: `git remote add origin <your-repo-url>`, `git push -u origin main`.
-2.  **Deploy**:
-    *   Go to [share.streamlit.io](https://share.streamlit.io/).
-    *   Log in with GitHub.
-    *   Click **"New app"**.
-    *   Select your repository, branch (`main`), and file (`app.py`).
-    *   Click **"Deploy"**.
-
+Evaluation note: The app currently calculates R² and mean squared error on the same rows used for fitting. These are training-fit metrics, not estimates of performance on unseen data. For a project with a held-out test evaluation, see [Customer Churn Prediction](Customer-Churn-Prediction/).
+Contact
+LinkedIn · GitHub profile
