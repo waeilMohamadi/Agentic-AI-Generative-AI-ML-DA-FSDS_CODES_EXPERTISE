@@ -1,0 +1,13 @@
+package com.waeil.commence;
+
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.stereotype.Component;
+
+@Component
+public class KeepAlive implements ApplicationRunner {
+    @Override
+    public void run(ApplicationArguments args) throws Exception {
+        Thread.currentThread().join(); // keep app running
+    }
+}

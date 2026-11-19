@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+  <appender name="STDERR" class="ch.qos.logback.core.ConsoleAppender">
+    <target>System.err</target>
+    <encoder>
+      <pattern>%d{HH:mm:ss.SSS} %-5level %logger{36} - %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <!-- Root at ERROR so STDOUT stays clean but you still get real errors -->
+  <root level="ERROR">
+    <appender-ref ref="STDERR" />
+  </root>
+
+  <!-- Optional: silence noisy libs even more -->
+  <logger name="org.springframework" level="ERROR"/>
+  <logger name="org.hibernate" level="ERROR"/>
+  <logger name="com.zaxxer.hikari" level="ERROR"/>
+
+</configuration>
