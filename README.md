@@ -5,6 +5,7 @@ Project	What it demonstrates	Stack
 [Customer Churn Prediction](Customer-Churn-Prediction/)	Reproducible classification pipeline, train-only cross-validation, held-out evaluation, a Gradio interface, and a FastAPI endpoint. The recorded test ROC AUC is 0.8436 on the included sample dataset.	Python, pandas, scikit-learn, Gradio, FastAPI
 [Document Q&A Assistant](Document-QA-Assistant/)	PDF question answering with OCR for scanned pages, local embeddings, vector retrieval, conversational follow-ups, and page-linked source passages.	Python, Streamlit, PyMuPDF, RapidOCR, Sentence Transformers, ChromaDB, Groq
 [Agentic Shopping Cart Assistant](Agentic-Shopping-Cart-MCP/)	A Spring Boot MCP server that exposes cart and product actions to an external AI assistant, backed by a MySQL cart.	Java 17, Spring Boot, Spring AI, MCP, MySQL, JUnit
+[Halcyon Flight App](flight-app/)	Flight search and booking demo with airport search, filters, and a local confirmation flow over sample inventory.	React, TypeScript, Vite, React Router
 EDA and Regression Analysis App	Interactive data exploration, missing-value handling, charts, and four regression models.	Python, Streamlit, pandas, scikit-learn
 [MLOps and MLflow experiment](mlops-code.py)	Compares classifiers on synthetic imbalanced data and logs parameters, metrics, and models to a local MLflow tracking server.	Python, scikit-learn, XGBoost, imbalanced-learn, MLflow
 
